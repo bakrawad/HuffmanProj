@@ -17,19 +17,21 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
 public class HelloApplication extends Application {
-    static MinHeap heap = new MinHeap(256);
+    static MinHeap heap ;
     StringBuilder preorder = new StringBuilder();
     String pre = "";
     static int[] CountChar = new int[256];
-    public static String[] encodings = new String[256];
+    public static String[] encodings;
     public static ObservableList<HufTable> Hufdata;
     public static int lineinheader;
     public static long size;
+    public static String textAr;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -87,9 +89,7 @@ public class HelloApplication extends Application {
         HufTab.getColumns().addAll(asciiColumn, huffmanColumn, lengthColumn, freqColumn);
 
         ArrayList<HufTable> hufList = new ArrayList<>();
-        hufList.add(new HufTable("hu", "b", 10, 5));
-        hufList.add(new HufTable("hu", "b", 10, 5));
-        hufList.add(new HufTable("hu", "b", 10, 5));
+
         Hufdata = FXCollections.observableArrayList(hufList);
 
         HufTab.setItems(Hufdata);
@@ -99,6 +99,10 @@ public class HelloApplication extends Application {
         pane.getChildren().add(HufTab);
 
         btcomp.setOnAction(e -> {
+            heap = new MinHeap(256);
+            textAr="";
+            textArea.clear();
+            textArea.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 13));
             HufTab.getItems().clear();
             Hufdata.clear();
 
@@ -106,9 +110,10 @@ public class HelloApplication extends Application {
 
             Window stage2 = null;
             File inputFile = fc.showOpenDialog(stage2);
-            long filein = inputFile.length();
-            String outputFile = ChangeExtension(inputFile.getPath(), "huf");
+
             if (inputFile != null) {
+                long filein = inputFile.length();
+                String outputFile = ChangeExtension(inputFile.getPath(), "huf");
                 try {
                     CountChar = new int[256];//for count the count of chars
                     BufferedInputStream br = new BufferedInputStream(new FileInputStream(inputFile));
@@ -125,6 +130,7 @@ public class HelloApplication extends Application {
                     }
 
                     heap.heapSort();//to sort the heap
+                    encodings = new String[256];
                     System.out.println();
                     BuldTree(heap);// build the tree
                     FileOutputStream out = new FileOutputStream(outputFile, true);
@@ -136,6 +142,14 @@ public class HelloApplication extends Application {
                     HufTab.refresh();
                     WriteHeader(getFileExtension(inputFile.getName()), outputFile, filein);//this method to write the header
                     WriteCompressedFile(inputFile.getPath(), output, encodings);//this method to compress the file
+                    File outt = new File(outputFile);
+                    textAr+="\n"+"Compressed File size: "+outt.length() + "\n";
+                    DecimalFormat CompRe = new DecimalFormat();
+                    CompRe.setMaximumFractionDigits(2);
+                    double CompressF = ((((double) outt.length() /inputFile.length())*100.0)-100);//Compression Ratio
+                    textAr+="\n"+"Compression Ratio = "+CompRe.format(CompressF)+"%" + "\n";
+                    textArea.setText(textAr);
+
                     br.close();
 
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -150,6 +164,8 @@ public class HelloApplication extends Application {
             }
         });
         btdecomp.setOnAction(e -> {
+            heap = new MinHeap(256);
+            textAr= "";
             FileChooser fc = new FileChooser();
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("huf files(*.huf)", "*.huf");
             fc.getExtensionFilters().add(extFilter);
@@ -165,7 +181,9 @@ public class HelloApplication extends Application {
                     BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File(newFile)));
                     inputStream.skipLines(lineinheader);//to skip the Header
                     DecompressFile(inputStream,output,heap.getNode(0),size);//to Start Decompressing the file
-
+                    textArea.clear();
+                    textArea.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 13));
+                    textArea.setText(textAr);
                 } catch (Exception e1) {
 
                 }
@@ -242,11 +260,16 @@ public class HelloApplication extends Application {
     }
 
     private void WriteHeader(String fileExtension, String newFilePath, long size) throws IOException {//this Method to write the Header
+        pre = "";
         PrintPreOrder();
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(newFilePath));
+        textAr="Header Size: "+pre.length() + "\n";
         out.write((pre.length() + "\n").getBytes());
+        textAr+="\n"+"Original File Size: "+size + "\n";
         out.write(String.valueOf(size).getBytes());
+        textAr+="\n"+"File Extension: "+fileExtension + "\n";
         String write = "\n" + fileExtension + "\n";
+        textAr+="\n"+"Huffman Tree: "+pre + "\n";
         out.write(write.getBytes());
         //StringBuilder numOfLine = new StringBuilder(pre + "");
         //int nu = countLines(numOfLine);
@@ -254,6 +277,7 @@ public class HelloApplication extends Application {
         write = pre + "\n";
         out.write(write.getBytes());
         out.close();
+
 
     }
 
@@ -298,6 +322,7 @@ public class HelloApplication extends Application {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String fileNameWithExtension = file.substring(file.lastIndexOf("\\") + 1);
             String path = file.substring(0, file.lastIndexOf("\\"));
+
             int extensionIndex = fileNameWithExtension.lastIndexOf(".");
             String fileName = fileNameWithExtension.substring(0, extensionIndex);
             String extension = fileNameWithExtension.substring(extensionIndex + 1);
@@ -314,6 +339,10 @@ public class HelloApplication extends Application {
                     readed++;
                     tree.append((char) reader.read());
                 }
+                textAr="Header Size: "+tree.length() + "\n";
+                textAr+="\n"+"Original File Size: "+size + "\n";
+                textAr+="\n"+"File Extension: "+fileExtension_original + "\n";
+                textAr+="\n"+"Huffman Tree: "+tree + "\n";
                 lineinheader+=countLines(tree);
 
 
