@@ -98,7 +98,7 @@ public class HelloApplication extends Application {
         HufTab.setLayoutY(400);
         pane.getChildren().add(HufTab);
 
-        btcomp.setOnAction(e -> {
+        btcomp.setOnAction(e -> {//button to start Compress the file
             heap = new MinHeap(256);
             textAr="";
             textArea.clear();
@@ -132,21 +132,29 @@ public class HelloApplication extends Application {
                     heap.heapSort();//to sort the heap
                     encodings = new String[256];
                     System.out.println();
+
                     BuldTree(heap);// build the tree
+
                     FileOutputStream out = new FileOutputStream(outputFile, true);
                     BitOutputStream output = new BitOutputStream(new BufferedOutputStream(out));
+
                     HuffmanCodes(heap.getNode(0), "", encodings);//this method to generate the huffman code
                     HufTab.getItems().clear();
+
                     FillTable();
                     HufTab.setItems(Hufdata);
                     HufTab.refresh();
+
                     WriteHeader(getFileExtension(inputFile.getName()), outputFile, filein);//this method to write the header
                     WriteCompressedFile(inputFile.getPath(), output, encodings);//this method to compress the file
+
                     File outt = new File(outputFile);
                     textAr+="\n"+"Compressed File size: "+outt.length() + "\n";
                     DecimalFormat CompRe = new DecimalFormat();
                     CompRe.setMaximumFractionDigits(2);
+
                     double CompressF = ((((double) outt.length() /inputFile.length())*100.0)-100);//Compression Ratio
+
                     textAr+="\n"+"Compression Ratio = "+CompRe.format(CompressF)+"%" + "\n";
                     textArea.setText(textAr);
 
@@ -271,8 +279,6 @@ public class HelloApplication extends Application {
         String write = "\n" + fileExtension + "\n";
         textAr+="\n"+"Huffman Tree: "+pre + "\n";
         out.write(write.getBytes());
-        //StringBuilder numOfLine = new StringBuilder(pre + "");
-        //int nu = countLines(numOfLine);
         //out.write((nu+"\n").getBytes());
         write = pre + "\n";
         out.write(write.getBytes());
@@ -292,7 +298,6 @@ public class HelloApplication extends Application {
             sb.append('ඕ'); // Appending a special character to represent null node in preorder
             return;
         }
-
         sb.append(node.data.ch);
         GeneratePreorder(node.left, sb);
         GeneratePreorder(node.right, sb);
