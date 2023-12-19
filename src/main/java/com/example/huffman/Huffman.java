@@ -357,6 +357,8 @@ public class Huffman extends Application {
                 heap = new MinHeap(1);
                 heap.insert(MinHeap.buildTree(tree.toString().toCharArray()));//tree
 
+
+
                 reader.close();
                 output.close();
             return newFile;
@@ -405,5 +407,6 @@ public class Huffman extends Application {
             e.printStackTrace();
         }
     }
+
 
 }
