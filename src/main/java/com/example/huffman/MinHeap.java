@@ -1,14 +1,14 @@
 package com.example.huffman;
 
 public class MinHeap {
-    private TNode<Data>[] heap;
+    private Node<Data>[] heap;
     private int size;
     private int capacity;
 
     public MinHeap(int capacity) {
         this.capacity = capacity;
         this.size = 0;
-        this.heap = new TNode [capacity];
+        this.heap = new Node[capacity];
     }
 
     private int parent(int i) {
@@ -23,7 +23,7 @@ public class MinHeap {
     }
 
 
-    public void insert(TNode<Data> value) {
+    public void insert(Node<Data> value) {
         if (size >= capacity) {
             System.out.println("Heap is full. Cannot insert more elements.");
             return;
@@ -56,12 +56,12 @@ public class MinHeap {
 
         return root;
     }
-    public TNode<Data> removeMin() {
+    public Node<Data> removeMin() {
         if (size == 0) {
             throw new IllegalStateException("Heap is empty");
         }
 
-        TNode<Data> removedElement = heap[0];
+        Node<Data> removedElement = heap[0];
         heap[0] = heap[size - 1];
         size--;
         minHeapify(0);
@@ -130,7 +130,7 @@ public class MinHeap {
     }
 
     private void swap(int i, int j) {
-        TNode<Data> temp = heap[i];
+        Node<Data> temp = heap[i];
         heap[i] = heap[j];
         heap[j] = temp;
     }
@@ -142,7 +142,7 @@ public class MinHeap {
             return null;
         }
     }
-    public TNode<Data> getNode(int i) {
+    public Node<Data> getNode(int i) {
         if (this.heap[i] != null) {
             return this.heap[i];
         } else {
@@ -150,7 +150,7 @@ public class MinHeap {
             return null;
         }
     }
-    public TNode<Data> setNode(int i, TNode<Data> node) {
+    public Node<Data> setNode(int i, Node<Data> node) {
         if (this.heap[i] != null) {
             this.heap[i] = node;
             return this.heap[i];
@@ -165,26 +165,22 @@ public class MinHeap {
     public int getSize(){
         return size;
     }
-    public static TNode<Data> buildTree(char[] preorder) {
+    public static Node<Data> buildTree(char[] preorder) {
         int[] index = {0}; // Using an array to pass index by reference
 
         return buildTreeHelper(preorder, index);
     }
 
-    private static TNode<Data> buildTreeHelper(char[] preorder, int[] index) {
-        // Base case: empty preorder or reached end of preorder
+    private static Node<Data> buildTreeHelper(char[] preorder, int[] index) {
+        //empty preorder or reached end of preorder
         if (index[0] >= preorder.length - 1 || preorder[index[0]] == 'ඕ') {
             index[0]++; // Move index to next character
             return null;
         }
 
-        // Create a new node with the current character
-        TNode<Data> node = new TNode<Data>(new Data(preorder[index[0]]));
+        Node<Data> node = new Node<Data>(new Data(preorder[index[0]]));
         index[0]++; // Move index to next character
 
-
-
-        // Construct left and right subtrees
         node.left = buildTreeHelper(preorder, index);
         node.right = buildTreeHelper(preorder, index);
 

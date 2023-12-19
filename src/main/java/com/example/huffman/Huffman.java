@@ -3,7 +3,6 @@ package com.example.huffman;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -19,10 +18,8 @@ import javafx.stage.Window;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Random;
 
-public class HelloApplication extends Application {
+public class Huffman extends Application {
     static MinHeap heap ;
     StringBuilder preorder = new StringBuilder();
     String pre = "";
@@ -123,7 +120,7 @@ public class HelloApplication extends Application {
                     }
                     for (int i = 0; i < CountChar.length; i++) {//insert the Data into the heap
                         if (CountChar[i] > 0) {
-                            heap.insert(new TNode<>(new Data(CountChar[i], (char) i)));
+                            heap.insert(new Node<>(new Data(CountChar[i], (char) i)));
                             String A = ((char) i) + "";
                             Hufdata.add(new HufTable(A, "", 0, CountChar[i]));
                         }
@@ -179,8 +176,6 @@ public class HelloApplication extends Application {
             fc.getExtensionFilters().add(extFilter);
             Window stage2 = null;
             File file = fc.showOpenDialog(stage2);
-
-
             if (file != null) {
 
                 try {
@@ -192,6 +187,11 @@ public class HelloApplication extends Application {
                     textArea.clear();
                     textArea.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 13));
                     textArea.setText(textAr);
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Done!");
+                    alert.setContentText("The File Has DeCompressed!!");
+                    alert.show();
                 } catch (Exception e1) {
 
                 }
@@ -214,9 +214,9 @@ public class HelloApplication extends Application {
 
         for (int i = 0; i < heap.getlength(); i++) {
             if (heap.getSize() > 1) {
-                TNode<Data> Z = new TNode<>(new Data());
-                TNode<Data> x = heap.removeMin();
-                TNode<Data> y = heap.removeMin();
+                Node<Data> Z = new Node<>(new Data());
+                Node<Data> x = heap.removeMin();
+                Node<Data> y = heap.removeMin();
                 Z.setLeft(x);
                 Z.setRight(y);
                 Z.data.freq = (x.data.freq + y.data.freq);
@@ -243,7 +243,7 @@ public class HelloApplication extends Application {
         }
     }
 
-    private static void HuffmanCodes(TNode<Data> root, String code, String[] encodings) {//this method to generate the Huffman Codes
+    private static void HuffmanCodes(Node<Data> root, String code, String[] encodings) {//this method to generate the Huffman Codes
         if (root == null) {
             return;
         }
@@ -293,7 +293,7 @@ public class HelloApplication extends Application {
         System.out.println(pre);
     }
 
-    private static void GeneratePreorder(TNode<Data> node, StringBuilder sb) {//this to Print preOrder
+    private static void GeneratePreorder(Node<Data> node, StringBuilder sb) {//this to Print tree preOrder
         if (node == null) {
             sb.append('ඕ'); // Appending a special character to represent null node in preorder
             return;
@@ -353,13 +353,9 @@ public class HelloApplication extends Application {
 
                 String newFile = path + "\\" + fileName + "." + fileExtension_original;
                 BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(new File(newFile)));
-
                 System.out.println(tree.toString());
                 heap = new MinHeap(1);
                 heap.insert(MinHeap.buildTree(tree.toString().toCharArray()));//tree
-
-                //System.out.println("test");
-
 
                 reader.close();
                 output.close();
@@ -382,8 +378,8 @@ public class HelloApplication extends Application {
 
         return count;
     }
-    private static void DecompressFile(BitInputStream input, BufferedOutputStream output, TNode<Data> root,long size) throws IOException {//This method to Decompressing the file
-        TNode<Data>curr = root;
+    private static void DecompressFile(BitInputStream input, BufferedOutputStream output, Node<Data> root, long size) throws IOException {//This method to Decompressing the file
+        Node<Data> curr = root;
         int bit;
         int count =0;
 
